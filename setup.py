@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
 import os
+from setuptools import setup, find_packages
+
+import django_sendmail_backend
+
 
 PROJECT_DIR = os.path.dirname(__file__)
 
 setup(
     name='django_sendmail_backend',
-    version='0.1.0',
+    version=django_sendmail_backend.__version__,
     url='https://github.com/perenecabuto/django-sendmail-backend.git',
     author="Felipe Ramos",
     author_email="perenecabuto@gmail.com",
