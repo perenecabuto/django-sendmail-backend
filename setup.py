@@ -9,7 +9,7 @@ PROJECT_DIR = os.path.dirname(__file__)
 setup(
     name='django_sendmail_backend',
     version='0.1.0',
-    url='https://github.com/perenecabuto/django_sendmail_backend.git',
+    url='https://github.com/perenecabuto/django-sendmail-backend.git',
     author="Felipe Ramos",
     author_email="perenecabuto@gmail.com",
     description="Its a simple command line sendmail backend for Django",
