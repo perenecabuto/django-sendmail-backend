@@ -1,19 +1,45 @@
-# -*- coding: utf-8 -*-
+"""
+Sendmail email backend class.
 
-from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
+Credits: https://djangosnippets.org/snippets/1864/
+"""
+from django.core.mail.backends.base import BaseEmailBackend
 from subprocess import Popen, PIPE
 
 
-class EmailBackend(ConsoleEmailBackend):
-
+class EmailBackend(BaseEmailBackend):
+    """
+    A wrapper that calls the sendmail program.
+    """
     def send_messages(self, email_messages):
-        # -t: Read message for recipients
-        mail_command = Popen(['/usr/sbin/sendmail', '-t'], stdin=PIPE, stderr=PIPE)
-        self.stream = mail_command.stdin
+        """
+        Sends one or more EmailMessage objects and returns the number of email
+        messages sent.
+        """
+        if not email_messages:
+            return
+        num_sent = 0
+        for message in email_messages:
+            if self._send(message):
+                num_sent += 1
+        return num_sent
 
-        super(EmailBackend, self).send_messages(email_messages)
-
-        (stdout, stderr) = mail_command.communicate()
-
-        if mail_command.returncode:
-            raise Exception('send_messages failed: %s' % (stderr if stderr else stdout,))
+    def _send(self, email_message):
+        """A helper method that does the actual sending."""
+        if not email_message.recipients():
+            return False
+        try:
+            # -t: Read message for recipients
+            ps = Popen(['/usr/sbin/sendmail', '-t'], stdin=PIPE, stderr=PIPE)
+            ps.stdin.write(email_message.message().as_bytes())
+            (stdout, stderr) = ps.communicate()
+        except:
+            if not self.fail_silently:
+                raise
+            return False
+        if ps.returncode:
+            if not self.fail_silently:
+                error = stderr if stderr else stdout
+                raise Exception('send_messages failed: %s' % error)
+            return False
+        return True
