@@ -7,10 +7,13 @@ from subprocess import Popen, PIPE
 class EmailBackend(ConsoleEmailBackend):
 
     def send_messages(self, email_messages):
-        recipient_email = email_messages[0].to[0]
-        mail_command = Popen("/usr/sbin/sendmail %s" % recipient_email, stdin=PIPE, shell=True)
+        # -t: Read message for recipients
+        mail_command = Popen(['/usr/sbin/sendmail', '-t'], stdin=PIPE, stderr=PIPE)
         self.stream = mail_command.stdin
 
         super(EmailBackend, self).send_messages(email_messages)
 
-        mail_command.communicate()
+        (stdout, stderr) = mail_command.communicate()
+
+        if mail_command.returncode:
+            raise Exception('send_messages failed: %s' % (stderr if stderr else stdout,))
