@@ -3,6 +3,7 @@ Sendmail email backend class.
 
 Credits: https://djangosnippets.org/snippets/1864/
 """
+from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from subprocess import Popen, PIPE
 
@@ -27,11 +28,13 @@ class EmailBackend(BaseEmailBackend):
     def _send(self, email_message):
         """A helper method that does the actual sending."""
         recipients = email_message.recipients()
+        sendmail_binary = getattr(settings, 'SENDMAIL_BINARY',
+                                  '/usr/sbin/sendmail')
         if not recipients:
             return False
         try:
             # -t: Read message for recipients
-            ps = Popen(['/usr/sbin/sendmail'] + recipients, stdin=PIPE, stderr=PIPE)
+            ps = Popen([sendmail_binary] + recipients, stdin=PIPE, stderr=PIPE)
             ps.stdin.write(email_message.message().as_bytes())
             (stdout, stderr) = ps.communicate()
         except:
