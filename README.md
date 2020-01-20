@@ -21,11 +21,16 @@ Set the EMAIL_BACKEND var in your settings module
 
     EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 
+If your sendmail binary is not at /usr/sbin/sendmail (see MTA section below),
+you'll also need to set
+
+    SENDMAIL_BINARY = '/path/to/sendmail'
+
 
 # MTA
 
-You will need any mta installed (like postfix or exim) and a executable **sendmail** command
-in your bin path.
+You will need any mta installed (like postfix or exim) and a executable
+**sendmail** command.
 
 Try to install [msmtp](http://msmtp.sourceforge.net/) for test
 
